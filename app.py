@@ -448,6 +448,17 @@ if "user_lat" not in st.session_state:
     st.session_state.user_lat = DEFAULT_LAT
 if "user_lon" not in st.session_state:
     st.session_state.user_lon = DEFAULT_LON
+
+# Apply any pending map-click location BEFORE the number_input widgets
+# below are created. Streamlit does not allow changing a widget's bound
+# session_state value after that widget has already been drawn in the
+# same run, so a click on the map only stores a "pending" value, which
+# gets applied here on the next run, before the widgets exist.
+if st.session_state.get("pending_lat") is not None:
+    st.session_state.user_lat = st.session_state.pending_lat
+    st.session_state.user_lon = st.session_state.pending_lon
+    st.session_state.pending_lat = None
+    st.session_state.pending_lon = None
 if "selected_result" not in st.session_state:
     st.session_state.selected_result = None
 if "selected_category" not in st.session_state:
@@ -537,8 +548,8 @@ with tab_map:
         clicked_lon = click_data["last_clicked"]["lng"]
         st.info(f"Pin dropped at {clicked_lat:.5f}, {clicked_lon:.5f}")
         if st.button("📍 Use this point as my location"):
-            st.session_state.user_lat = clicked_lat
-            st.session_state.user_lon = clicked_lon
+            st.session_state.pending_lat = clicked_lat
+            st.session_state.pending_lon = clicked_lon
             st.session_state.selected_result = None
             st.rerun()
 
