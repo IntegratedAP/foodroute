@@ -1,0 +1,14 @@
+{
+"type": "FeatureCollection",
+"name": "markets",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "addr:housenumber": "1", "addr:street": "Oluyole Way", "name": "Favos Supermarket", "shop": "supermarket", "amenity": null, "addr:city": null, "alt_name": null, "phone": null, "website": null }, "geometry": { "type": "Point", "coordinates": [ 3.911149, 7.4184493 ] } },
+{ "type": "Feature", "properties": { "addr:housenumber": null, "addr:street": null, "name": "Bodija Market", "shop": null, "amenity": "marketplace", "addr:city": null, "alt_name": null, "phone": null, "website": null }, "geometry": { "type": "Point", "coordinates": [ 3.9157745, 7.4371869 ] } },
+{ "type": "Feature", "properties": { "addr:housenumber": null, "addr:street": "Kenneth Dike Way", "name": "Foodco SuperMarket", "shop": "supermarket", "amenity": null, "addr:city": "Ibadan", "alt_name": "Foodco Bodija", "phone": "+234 906 505 0081", "website": "https://foodco.ng/ibadan/" }, "geometry": { "type": "Point", "coordinates": [ 3.9098231, 7.4223904 ] } },
+{ "type": "Feature", "properties": { "addr:housenumber": null, "addr:street": "Kenneth Dike Way", "name": "Big Treat", "shop": "supermarket", "amenity": null, "addr:city": "Ibadan", "alt_name": null, "phone": null, "website": null }, "geometry": { "type": "Point", "coordinates": [ 3.9102683, 7.4233213 ] } },
+{ "type": "Feature", "properties": { "addr:housenumber": null, "addr:street": null, "name": "Agbowo Shopping Complex", "shop": "supermarket", "amenity": null, "addr:city": "Ibadan", "alt_name": null, "phone": null, "website": null }, "geometry": { "type": "Point", "coordinates": [ 3.9073608, 7.4403725 ] } },
+{ "type": "Feature", "properties": { "addr:housenumber": null, "addr:street": null, "name": "Preboye's World", "shop": "supermarket", "amenity": null, "addr:city": null, "alt_name": null, "phone": null, "website": null }, "geometry": { "type": "Point", "coordinates": [ 3.9076559, 7.4387621 ] } },
+{ "type": "Feature", "properties": { "addr:housenumber": null, "addr:street": null, "name": "Tolulope Plaza", "shop": null, "amenity": "marketplace", "addr:city": null, "alt_name": null, "phone": null, "website": null }, "geometry": { "type": "Point", "coordinates": [ 3.9096062, 7.4378963 ] } }
+]
+}
