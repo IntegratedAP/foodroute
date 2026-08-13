@@ -245,7 +245,7 @@ def nearest_location_straight(lat, lon, locations):
     return best
 
 
-def nearest_by_road(lat, lon, locations, graph, max_candidates=15):
+def nearest_by_road(lat, lon, locations, graph, max_candidates=30):
     if locations is None or locations.empty or graph is None:
         return None
 
