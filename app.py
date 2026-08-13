@@ -142,12 +142,11 @@ def load_points(path):
 @st.cache_resource
 def load_graph(path):
     if not path.exists():
-        return None
+        return None, f"File not found: {path.name}"
     try:
-        return ox.load_graphml(path)
+        return ox.load_graphml(path), None
     except Exception as e:
-        st.error(f"Could not load road network: {e}")
-        return None
+        return None, f"{type(e).__name__}: {e}"
 
 
 data_missing = not (MARKETS_FILE.exists() and ROADS_DRIVE_FILE.exists())
@@ -162,8 +161,20 @@ if data_missing:
 
 markets = load_points(MARKETS_FILE)
 restaurants = load_points(RESTAURANTS_FILE)
-G_drive = load_graph(ROADS_DRIVE_FILE)
-G_walk = load_graph(ROADS_WALK_FILE) if ROADS_WALK_FILE.exists() else None
+G_drive, drive_load_error = load_graph(ROADS_DRIVE_FILE)
+G_walk, walk_load_error = load_graph(ROADS_WALK_FILE) if ROADS_WALK_FILE.exists() else (None, "roads_walk.graphml not found")
+
+with st.expander("🔧 Diagnostics (click to check data health)"):
+    st.write(f"Markets loaded: **{len(markets) if markets is not None else 0}**")
+    st.write(f"Restaurants loaded: **{len(restaurants) if restaurants is not None else 0}**")
+    if G_drive is not None:
+        st.success(f"Drive network loaded: {len(G_drive.nodes):,} nodes, {len(G_drive.edges):,} edges")
+    else:
+        st.error(f"Drive network FAILED to load. Reason: {drive_load_error}")
+    if G_walk is not None:
+        st.success(f"Walk network loaded: {len(G_walk.nodes):,} nodes, {len(G_walk.edges):,} edges")
+    else:
+        st.warning(f"Walk network not available. Reason: {walk_load_error}")
 
 # ============================================================
 # HELPERS
@@ -198,6 +209,7 @@ def estimate_minutes(distance_km, mode):
 
 def route_to_location(lat, lon, dest_lat, dest_lon, graph):
     if graph is None:
+        st.session_state.last_routing_error = "Road network graph is None (failed to load)."
         return None
     try:
         origin_node = ox.distance.nearest_nodes(graph, lon, lat)
@@ -223,7 +235,8 @@ def route_to_location(lat, lon, dest_lat, dest_lon, graph):
             "distance_m": total_length,
             "distance_km": total_length / 1000.0,
         }
-    except Exception:
+    except Exception as e:
+        st.session_state.last_routing_error = f"{type(e).__name__}: {e}"
         return None
 
 
@@ -465,6 +478,8 @@ if "selected_category" not in st.session_state:
     st.session_state.selected_category = "Market"
 if "question" not in st.session_state:
     st.session_state.question = ""
+if "last_routing_error" not in st.session_state:
+    st.session_state.last_routing_error = "none recorded yet"
 
 # ============================================================
 # SIDEBAR
@@ -594,6 +609,7 @@ with tab_search:
                         st.success(f"Route found: {r['distance_km']:.2f} km. See the 'Map & Route' tab.")
                     else:
                         st.error("No road route could be calculated to this market.")
+                        st.caption(f"Technical reason: {st.session_state.get('last_routing_error', 'unknown')}")
         else:
             st.warning("No market data found. Run data_prep.py first.")
 
@@ -630,6 +646,7 @@ with tab_search:
                         st.success(f"Route found: {r['distance_km']:.2f} km. See the 'Map & Route' tab.")
                     else:
                         st.error("No road route could be calculated to this restaurant.")
+                        st.caption(f"Technical reason: {st.session_state.get('last_routing_error', 'unknown')}")
         else:
             st.warning("No restaurant data found. Run data_prep.py first.")
 
@@ -668,6 +685,7 @@ with tab_ai:
                     result = nearest_by_road(lat, lon, locs, q_graph)
                 if result is None:
                     st.error("No suitable mapped location could be found on this road network.")
+                    st.caption(f"Technical reason: {st.session_state.get('last_routing_error', 'unknown')}")
                 else:
                     st.session_state.selected_result = result
                     st.session_state.selected_category = interp["category"] if interp["category"] != "All food locations" else "Market"
